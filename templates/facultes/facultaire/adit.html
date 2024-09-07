@@ -1,0 +1,91 @@
+<!-- Modal -->
+<div class="modal fade" id="modelEditerfacultaire" tabindex="-1" role="dialog"  aria-hidden="true"> 
+    <div class="modal-dialog" role="document"> 
+            <div class="modal-content">
+                    <div class="modal-header">
+                            <h5 class="modal-title">Modifier Facultaire</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                        </div>
+            <form  id="submitFormfacultaireEdit">
+                    <span id="idfacultaire" hidden></span>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="form-group">
+                            <label for="">Actif</label>
+                            <input required type="checkbox"  name="actif"  id="facultaireactif" aria-describedby="helpId" placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <select required class="form-control " name="enseignant" id="">
+                                <option value="">Selectionner un enseignant</option>
+                            {% for enseignant in enseignants   %}
+                                <option value="{{enseignant.id}}">{{enseignant.nom}} {{enseignant.prenom}}</option>
+                            {% endfor %}
+                        </select>
+                        
+                        <div class="form-group">
+                            <select required class="form-control " name="faculte" id="">
+                                <option value="">Selectionner faculte</option>
+                            {% for faculte in facultes   %}
+                                <option value="{{faculte.id}}">{{faculte.designation}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id='submitCanceledfacultaireFormEdit' data-dismiss="modal">Fermer</button>
+                        <button type="submit" class="btn btn-secondary">Enregistrer</button>
+                    </div>
+                </div>
+        </form>
+                
+            </div>
+    </div>
+</div>
+
+<script>
+    $('#submitCanceledfacultaireFormEdit').on('click', function(event) {
+        event.preventDefault();
+        $("#modelEditerfacultaire").modal('hide'); 
+    }) 
+
+    $('.launchEditfacultaire').click(function() {
+        var itemId = $(this).data('id');
+        
+        $('#idfacultaire').val(itemId) 
+
+        var designation = $(this).attr('data-designation'); 
+
+        var facultaire = $(this).attr('data-facultaire');
+
+
+
+        $("#designationfacultaire").val(designation)
+
+
+
+    }) 
+    
+    $('#submitFormfacultaireEdit').on('submit', function(event){
+        event.preventDefault(); 
+        const formData = new FormData(this); 
+            // Remove classe and facultaire keys
+        formData.delete('facultaire');
+       var itemId=  $('#idfacultaire').val() 
+        $.ajax({
+            url: `/facultaire-edit/${itemId}/`, 
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                alert('Modification de la ponderation effectué avec succès'); 
+                window.location.href = ""; 
+            },
+            error: function(error) {
+                alert('Une errreur est survenue');
+            }
+        });
+
+    })
+</script>

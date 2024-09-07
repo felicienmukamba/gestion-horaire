@@ -1,0 +1,145 @@
+{% extends "../core/index.html" %} {% load static %} {% block content %}
+<div class="container">
+    <div class="page-inner">
+        <div class="page-header mb-0">
+            <h3 class="fw-bold mb-1">Gestion Facultes</h3>
+            <ul class="breadcrumbs mb-1">
+                <li class="nav-home">
+                    <a href="#">
+                        <i class="icon-home"></i>
+                    </a>
+                </li>
+                <li class="separator">
+                    <i class="icon-arrow-right"></i>
+                </li>
+                <li class="nav-item">
+                    <a href="#">Facultes</a>
+                </li>
+                <li class="separator">
+                    <i class="icon-arrow-right"></i>
+                </li>
+                <li class="separator">
+                    <i class="icon-arrow-right"></i>
+                </li>
+                <li class="nav-item">
+                    <a href="#">faculte</a>
+                </li>
+            </ul>
+        </div>
+        <div class="row mt-5">
+            <div class="col-md-12 card">
+                <div class="card-header">
+                    <div class="row d-flex justify-content-between">
+                        <div class="col-md-6 col-4">
+                            <h4>faculte</h4>
+                        </div> 
+                            <div class="col-md-6 col-4 text-end">
+                                <button class="btn btn-secondary btn-round" data-bs-toggle="modal" data-bs-target="#modelAddfacultes">
+                                    <i class="fa fa-plus" title='ajouter une nouvelle option option'></i> Ajouter faculte
+                                </button>
+                            </div>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <table               id="basic-datatables"
+                    class="display table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Designation</th>
+                                <th scope="col" class='text-center'>Actions</th>
+                            </tr>
+        
+                        </thead>
+                       
+                        <tbody>
+                            {% for faculte in facultes %}
+                            <tr>
+                                <td>{{ forloop.counter }}
+                                </td>
+                                <td>{{faculte.designation}}</td>
+                                <td class='text-center'>
+                                    <button class="btn btn-primary ms-auto launchEditfacultes" data-bs-target="#modelEditerfacultes" data-bs-toggle="modal"  data-id="{{ faculte.id }}"
+                                    data-designation="{{faculte.designation}}"
+                                    >
+                                    <i class="fa fa-edit text-light"></i>
+                                </button>
+                                    <button class="btn btn-danger launchDeleteModalfacultes"  data-id="{{ faculte.id }}"
+                                    >
+                                <i class="fa fa-trash text-light "></i> 
+                            </button>
+        
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+
+{% include './add.html' %}
+{% include './adit.html' %}
+
+<script text="text-javascript">
+        $('.launchDeleteModalfacultes').click(function() {
+        var itemId = $(this).attr('data-id');
+        var content = {};
+        content.icon = "fa fa-bell";
+        content.message = "Enregistrement faculte supprimée avec succès."
+
+        // Show confirmation dialog
+        swal({
+            title: "Gestion faculte",
+            text: "Est ce que vous voulez vraiment supprimer cette faculte",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                // Proceed with deletion if confirmed
+                $.ajax({
+                    url: `/faculte-delete/${itemId}/`,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            swal("Gestion-faculte", {
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        text: "OK",
+                                        value: true,
+                                        visible: true,
+                                        className: "btn btn-success",
+                                        closeModal: true,
+                                    },
+                                },
+                                text: "faculte supprimée avec succès !",
+                                type: "info",
+                            }).then(() => {
+                                window.location.href = ""; // Redirect to inscription URL
+                            });
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Suppression non effectuée, veuillez verifier que cette faculte nest pas relation avec les autres enregistrements')
+                    }
+                });
+            } else {
+                swal("Suppression annulée", {
+                    icon: "info",
+                });
+            }
+        });
+    });
+</script>
+{% endblock content %}
